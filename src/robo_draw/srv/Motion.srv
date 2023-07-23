@@ -1,0 +1,6 @@
+geometry_msgs/Twist twist
+float32 duration
+bool penUp
+---
+bool success
+string message

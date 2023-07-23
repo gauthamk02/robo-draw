@@ -1,0 +1,4 @@
+<launch>
+    <node name="main" pkg="robo_draw" type="main.py">
+    <node name="nodemcu" pkg="robo_draw" type="nodemcu.py">
+</launch>

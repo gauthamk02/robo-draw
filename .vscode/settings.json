@@ -1,0 +1,12 @@
+{
+    "cmake.sourceDirectory": "/home/gautham/ros_project_ws/src/robo_draw",
+    "cmake.configureOnOpen": false,
+    "python.autoComplete.extraPaths": [
+        "/opt/ros/noetic/lib/python3/dist-packages",
+        "/home/gautham/ros_project_ws/devel/lib/python3/dist-packages"
+    ],
+    "python.analysis.extraPaths": [
+        "/opt/ros/noetic/lib/python3/dist-packages",
+        "/home/gautham/ros_project_ws/devel/lib/python3/dist-packages"
+    ]
+}
