@@ -4,8 +4,9 @@ import rospy
 import requests
 from robo_draw.srv import Motion, MotionRequest
 import time
+import math
 
-BASE_ADDR = 'http://192.168.118.34'
+BASE_ADDR = 'http://192.168.45.34'
 penUp = True
 
 def callback(data: MotionRequest):
@@ -16,7 +17,7 @@ def callback(data: MotionRequest):
     duration = data.duration
     pen_up = data.penUp
     distance = 2 * speed * duration
-    angle = -1 * angular_speed * duration * 180 / 3.14159265358979323846
+    angle = -1 * angular_speed * duration * 180 / math.pi
     
     resp = {'success': False, 'message': 'Unknown error.'}
 
@@ -24,15 +25,15 @@ def callback(data: MotionRequest):
         resp = move(distance)
     
     elif angle != 0:
-        print("Angle:", angle)
+        print("\rAngle:", angle.trim())
         resp = turn(angle)
 
     else:
-        print("penUp:", penUp)
+        print("\rpenUp:", penUp.trim())
         penUp = pen_up
         resp = pen()
     
-    print(resp)
+    print(resp+"\n")
     return resp
 
 def move(dist):
@@ -77,11 +78,11 @@ if __name__ == '__main__':
         try:
             resp = requests.get(BASE_ADDR, timeout=2)
             if resp.status_code == 200:
-                print("Device connected at:", BASE_ADDR)
+                print("\rDevice connected at:", BASE_ADDR)
                 break
             else:
-                print("Device not online. Retrying in 1 second.")
-                print("Response:", resp)
+                print("\rDevice not online. Retrying in 1 second.")
+                print("\rResponse:", resp)
                 time.sleep(1)
         except requests.exceptions.RequestException as err:
             print ("Request exception:",err)

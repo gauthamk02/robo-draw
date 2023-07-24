@@ -48,7 +48,7 @@ def set_pen(pen):
         set_pen = rospy.ServiceProxy('turtle1/set_pen', SetPen)
         set_pen(255, 255, 255, LINE_WIDTH, pen)
     except rospy.ServiceException as e:
-        print("Service call failed:", e)
+        print("\rService call failed:", e)
 
 def reset_turtle():
     # Function to reset the TurtleBot's position
@@ -57,7 +57,7 @@ def reset_turtle():
         reset = rospy.ServiceProxy('reset', Empty)
         reset()
     except rospy.ServiceException as e:
-        print("Service call failed:", e)
+        print("\rService call failed:", e)
 
 def item_to_motion(item):
     if type(item) is tuple:
@@ -73,15 +73,15 @@ def draw(movements):
         draw_proxy = rospy.ServiceProxy('motion', Motion, persistent=True)
         for motion in motions:
             resp = draw_proxy(motion)
-            print("Response:", resp)
+            print("\rResponse:", resp)
     except rospy.ServiceException as e:
-        print("Service call failed:", e)
+        print("\rService call failed:", e)
 
 def append_movement(twist_msg, twist_duration_list, isPenUp, start_time):
     end_time = time.time()
     duration = end_time - start_time
     twist_duration_list.append((copy.deepcopy(twist_msg), duration, isPenUp))
-    print(f"Twist: {twist_msg}\nDuration: {duration}s\n")
+    # print(f"Twist: {twist_msg}\nDuration: {duration}s\n")
 
 def main():
     # Start the get_key function in a separate thread
@@ -105,13 +105,13 @@ def main():
     import os
     os.system('cls' if os.name == 'nt' else 'clear')
 
-    print("\n----------------------------")
-    print("Use 'W', 'A', 'S', 'D' to move the TurtleBot.")
-    print("Press 'Space' to stop it.")
-    print("Press 'I' to invert the pen.")
-    print("Press 'R' to reset the TurtleBot's position.")
-    print("Press 'Ctrl + C' to exit.")
-    print("----------------------------")
+    print("\r\n----------------------------")
+    print("\rUse 'W', 'A', 'S', 'D' to move the TurtleBot.")
+    print("\rPress 'Space' to stop it.")
+    print("\rPress 'I' to invert the pen.")
+    print("\rPress 'R' to reset the TurtleBot's position.")
+    print("\rPress 'Ctrl + C' to exit.")
+    print("\r----------------------------")
 
     last_key = None
     start_time = None
@@ -161,7 +161,7 @@ def main():
                 sys.exit(0)
 
             elif key is not None:
-                print("Invalid key:", key)
+                print("\rInvalid key:", key)
                 continue
 
     except rospy.ROSInterruptException:
