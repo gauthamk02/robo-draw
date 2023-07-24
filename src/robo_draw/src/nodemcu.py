@@ -6,74 +6,79 @@ from robo_draw.srv import Motion, MotionRequest
 import time
 import math
 
-BASE_ADDR = 'http://192.168.45.34'
+BASE_ADDR = "http://192.168.45.34"
 penUp = True
+
 
 def callback(data: MotionRequest):
     global penUp
-    # print(data)
     speed = data.twist.linear.x
     angular_speed = data.twist.angular.z
     duration = data.duration
     pen_up = data.penUp
     distance = 2 * speed * duration
     angle = -1 * angular_speed * duration * 180 / math.pi
-    
-    resp = {'success': False, 'message': 'Unknown error.'}
+
+    resp = {"success": False, "message": "Unknown error."}
 
     if distance != 0:
+        print("\rDistance:", distance)
         resp = move(distance)
-    
+
     elif angle != 0:
-        print("\rAngle:", angle.trim())
+        print("\rAngle:", angle)
         resp = turn(angle)
 
     else:
-        print("\rpenUp:", penUp.trim())
+        print("\rpenUp:", penUp)
         penUp = pen_up
         resp = pen()
-    
-    print(resp+"\n")
+
     return resp
 
+
 def move(dist):
-    url = BASE_ADDR + '/move'
-    data = {'distance': dist}
+    url = BASE_ADDR + "/move"
+    data = {"distance": dist}
     resp = requests.post(url, data=data)
 
     if resp.status_code == 200:
-        return {'success': True, 'message': 'Success!'}
+        return {"success": True, "message": f"Distance= {resp.json()['distance']}"}
     else:
-        return {'success': False, 'message': resp.text}
-    
+        return {"success": False, "message": resp.text}
+
+
 def turn(angle):
-    url = BASE_ADDR + '/turn'
-    data = {'angle': angle}
+    url = BASE_ADDR + "/turn"
+    data = {"angle": angle}
     resp = requests.post(url, data=data)
 
     if resp.status_code == 200:
-        return {'success': True, 'message': 'Success!'}
+        return {"success": True, "message": f"Angle= {resp.json()['angle']}"}
     else:
-        return {'success': False, 'message': resp.text}
+        return {"success": False, "message": resp.text}
+
 
 def pen():
-    url = BASE_ADDR + '/pen'
-    data = {'position': 'up' if penUp else 'down'}
+    url = BASE_ADDR + "/pen"
+    data = {"position": "up" if penUp else "down"}
     resp = requests.post(url, data=data)
+    print(resp.json())
 
     if resp.status_code == 200:
-        return {'success': True, 'message': 'Success!'}
+        return {"success": True, "message": f"Pen= {resp.json()['position']}"}
     else:
-        return {'success': False, 'message': resp.text}
-    
-def service_listener():
+        return {"success": False, "message": resp.text}
 
-    service = rospy.Service('motion', Motion, callback)
+
+def service_listener():
+    service = rospy.Service("motion", Motion, callback)
 
     rospy.spin()
 
-if __name__ == '__main__':
-    rospy.init_node('nodemcu_comm', anonymous=True)
+
+if __name__ == "__main__":
+    rospy.init_node("nodemcu_comm", anonymous=True)
     while True:
         try:
             resp = requests.get(BASE_ADDR, timeout=2)
@@ -85,7 +90,7 @@ if __name__ == '__main__':
                 print("\rResponse:", resp)
                 time.sleep(1)
         except requests.exceptions.RequestException as err:
-            print ("Request exception:",err)
+            print("Request exception:", err)
             time.sleep(1)
     try:
         service_listener()

@@ -109,7 +109,7 @@ void handlePen() {
   else if (pos.equals("down")) isPenUp = false;
   else server.send(400, "text/plain", "Unidentified value for 'position' argument");
 
-  httpResp = "{\"angle\": \"" + pos + "\"}";
+  httpResp = "{\"position\": \"" + pos + "\"}";
   sendResponse(httpResp, 200);
 }
 

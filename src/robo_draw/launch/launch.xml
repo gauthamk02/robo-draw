@@ -1,4 +1,5 @@
 <launch>
-    <node name="main" pkg="robo_draw" type="main.py">
-    <node name="nodemcu" pkg="robo_draw" type="nodemcu.py">
+    <node name="turtle" pkg="turtlesim" type="turtlesim_node" output="screen"/>
+    <node name="main" pkg="robo_draw" type="main.py" output="screen"/>
+    <node name="nodemcu" pkg="robo_draw" type="nodemcu.py" output="screen"/>
 </launch>
