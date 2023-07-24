@@ -2,11 +2,10 @@
 
 import rospy
 import requests
-from std_msgs.msg import String
 from robo_draw.srv import Motion, MotionRequest
 import time
 
-BASE_ADDR = 'http://192.168.49.34'
+BASE_ADDR = 'http://192.168.118.34'
 penUp = True
 
 def callback(data: MotionRequest):
@@ -73,7 +72,7 @@ def service_listener():
     rospy.spin()
 
 if __name__ == '__main__':
-    rospy.init_node('node2', anonymous=True)
+    rospy.init_node('nodemcu_comm', anonymous=True)
     while True:
         try:
             resp = requests.get(BASE_ADDR, timeout=2)

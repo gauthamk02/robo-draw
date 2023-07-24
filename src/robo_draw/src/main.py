@@ -6,7 +6,7 @@ import sys
 import termios
 import tty
 from turtlesim.srv import SetPen
-from robo_draw.srv import Motion, MotionRequest, MotionResponse
+from robo_draw.srv import Motion, MotionRequest
 import copy
 import time  # Import time for tracking duration
 import threading  # Import threading for non-blocking input
@@ -65,23 +65,13 @@ def item_to_motion(item):
         return motion
     raise TypeError("item must be a tuple of Twist and float and bool")
 
-def is_movement_empty(movement):
-    twist = movement[0]
-    duration = movement[1]
-    return twist.linear.x == 0 and twist.angular.z == 0
-
 def draw(movements):
     print(movements)
     motions = [item_to_motion(item) for item in movements]
-    # penState = motions[0].penUp
 
     try:
         draw_proxy = rospy.ServiceProxy('motion', Motion, persistent=True)
         for motion in motions:
-            # if motion.penUp != penState:
-            #     penState = motion.penUp
-            #     resp = draw_proxy(MotionRequest(Twist(), 0, penState))
-            #     print("Response:", resp)
             resp = draw_proxy(motion)
             print("Response:", resp)
     except rospy.ServiceException as e:
@@ -95,7 +85,7 @@ def append_movement(twist_msg, twist_duration_list, isPenUp, start_time):
 
 def main():
     # Start the get_key function in a separate thread
-    rospy.init_node('turtlebot_keyboard_control')  # Initialize the ROS node
+    rospy.init_node('robo_draw_main', anonymous= True)  # Initialize the ROS node
 
     # Define the message publisher
     cmd_vel_pub = rospy.Publisher('turtle1/cmd_vel', Twist, queue_size=1)
@@ -104,13 +94,13 @@ def main():
     twist_msg = Twist()
 
     # List to store tuples of Twist messages and durations
-    twist_duration_list = []
+    movement_instructions_list = []
 
     global penUp
     penUp = False
     set_pen(penUp)
 
-    twist_duration_list.append((copy.deepcopy(twist_msg), 0, penUp))
+    movement_instructions_list.append((copy.deepcopy(twist_msg), 0, penUp))
 
     import os
     os.system('cls' if os.name == 'nt' else 'clear')
@@ -137,18 +127,18 @@ def main():
                 if key == 'i':
                     penUp = not penUp
                     set_pen(penUp)
-                    twist_duration_list.append((Twist(), 0, penUp))
+                    movement_instructions_list.append((Twist(), 0, penUp))
                     continue
                 elif key == 'p':
-                    draw(twist_duration_list)
-                    twist_duration_list = []
+                    draw(movement_instructions_list)
+                    movement_instructions_list = []
                     continue
                 elif key == 'r':
                     reset_turtle()
                     return
                 if key != last_key:
                     if last_key is not None:
-                        append_movement(twist_msg, twist_duration_list, penUp, start_time)
+                        append_movement(twist_msg, movement_instructions_list, penUp, start_time)
                     # if start_time is None or last_update_time == start_time:
                     start_time = time.time()  # Reset start_time whenever a new key is pressed
                     last_key = key
@@ -159,7 +149,7 @@ def main():
                 last_update_time = time.time()
 
             elif last_key is not None and time.time() - last_update_time > 1:
-                append_movement(twist_msg, twist_duration_list, penUp, start_time)
+                append_movement(twist_msg, movement_instructions_list, penUp, start_time)
                 last_key = None
                 start_time = None
                 last_update_time = None
@@ -186,7 +176,7 @@ def main():
     if start_time is not None:
         end_time = time.time()
         duration = end_time - start_time
-        twist_duration_list.append((twist_msg, duration))
+        movement_instructions_list.append((twist_msg, duration))
 
 if __name__ == '__main__':
     thread = threading.Thread(target=get_key, daemon=True)
